@@ -1,5 +1,7 @@
 BasicBrawl
 ==========
 
-A BaseGames Arena Game, a Basic 2D brawler arena 
+A Basic 2D brawler arena
+
+You up for a Fight?
 
