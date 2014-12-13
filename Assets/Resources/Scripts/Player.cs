@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class Player : MonoBehaviour {
+	private float tempVel;
+	private Vector2 playerVector;
+	public float smooth = 1000f;
+
 	/// <summary cref="C &lt; T &gt;">
 	/// Executes the player movement.
 	/// </summary>
