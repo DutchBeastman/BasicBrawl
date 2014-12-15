@@ -62,6 +62,7 @@ public class Player : MonoBehaviour, IInteractable {
 		lookRight = !lookRight;
 
 	}
+
 	/// <summary>
 	/// Owner of the axe that is thrown.
 	/// </summary>
