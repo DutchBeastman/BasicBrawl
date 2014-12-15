@@ -6,6 +6,7 @@ public class Axe : MonoBehaviour {
 
 	[SerializeField]
 	private int numAxes;
+	[SerializeField]
 	private List<GameObject> axes;
 
 
@@ -15,12 +16,14 @@ public class Axe : MonoBehaviour {
 		axes = new List<GameObject>();
 
 		for(int i = 0; i < numAxes; i++){
-			axes.Add(GameObject.Instantiate(Resources.Load(AXE_PREFAB),transform.position, Quaternion.identity));
+
+			axes.Add(GameObject.Instantiate(Resources.Load(AXE_PREFAB),transform.position, Quaternion.identity) as GameObject);
+
 		}
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void FixedUpdate () {
+		
 	}
 }
