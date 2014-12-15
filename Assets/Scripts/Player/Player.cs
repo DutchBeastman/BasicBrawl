@@ -42,6 +42,8 @@ public class Player : MonoBehaviour, IInteractable {
 		float translation = Input.GetAxis("Horizontal") * speed;
 		translation *= Time.deltaTime;
 		transform.Translate(translation,0,0);
+		animator.SetFloat("speed", 1);
+
 
 		//to determine where the player should look
 		if(Input.GetAxis("Horizontal") > 0 && !lookRight){
