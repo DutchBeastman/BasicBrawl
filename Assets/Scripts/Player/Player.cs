@@ -45,16 +45,20 @@ public class Player : MonoBehaviour, IInteractable {
 	/// </summary>
 	public void PlayerMovement(){
 
-		float translationY = Input.GetAxis ("Vertical") * 15;
+		float translationY = Input.GetAxis ("Vertical") * 20;
 		float translation = Input.GetAxis("Horizontal") * speed;
 		translation *= Time.deltaTime;
 		translationY *= Time.deltaTime;
-		transform.Translate(translation,translationY,0);
-		animator.SetFloat("speed", 1);
-		if(!jump){
+		transform.Translate(translation,0,0);
+
+		if(!jump && Input.GetAxis ("Vertical") > 0){
+			transform.Translate(0,translationY,0);
 			jump = true;
 		}
-
+		//executes the walk animation 
+		if(Input.GetAxis("Horizontal") > 0){
+			animator.SetFloat("speed", 1);
+		}
 		//to determine where the player should look
 		if(Input.GetAxis("Horizontal") > 0 && !lookRight){
 			Flip();
