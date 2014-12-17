@@ -14,17 +14,22 @@ public class Player : MonoBehaviour, IInteractable {
 
 	private bool jump;
 
+	private Vector2 footBase;
+
 	void Start(){
+
 		animator = GetComponent<Animator>();
 	}
 
 
 	void FixedUpdate() {
 		PlayerMovement();
-		Debug.DrawRay(transform.position, -Vector2.up, Color.green, 1, false);
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, 4,9);
-		if (hit.collider != null) {
+		footBase = new Vector2(transform.position.x,transform.position.y -0.15f);
+		Debug.DrawRay(footBase, -Vector2.up, Color.green, 0.5f, false);
+		RaycastHit2D hit = Physics2D.Raycast(footBase, -Vector2.up, 0.5f);
+		if (hit.collider.gameObject.name == "ground") {
 			Debug.Log(hit.collider.name + " Dit hit ik");
+			jump = false;
 		}
 		//Determine the animation of the attack
 		if(Input.GetKeyDown(KeyCode.Space)){
@@ -39,11 +44,16 @@ public class Player : MonoBehaviour, IInteractable {
 	/// Executes the player movement.
 	/// </summary>
 	public void PlayerMovement(){
+
+		float translationY = Input.GetAxis ("Vertical") * 15;
 		float translation = Input.GetAxis("Horizontal") * speed;
 		translation *= Time.deltaTime;
-		transform.Translate(translation,0,0);
+		translationY *= Time.deltaTime;
+		transform.Translate(translation,translationY,0);
 		animator.SetFloat("speed", 1);
-
+		if(!jump){
+			jump = true;
+		}
 
 		//to determine where the player should look
 		if(Input.GetAxis("Horizontal") > 0 && !lookRight){
