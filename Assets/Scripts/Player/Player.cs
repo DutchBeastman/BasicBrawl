@@ -33,10 +33,14 @@ public class Player : MonoBehaviour, IInteractable {
 		}
 		//Determine the animation of the attack
 		if(Input.GetKeyDown(KeyCode.Space)){
-			if(Random.Range(0f, 1.0f) > 0.1f)
+			if(Random.Range(0f, 1.0f) > 0.1f){
 				animator.SetTrigger("attack");
-			else
+				Throw((int)transform.localScale.x);
+			}
+			else{
 				animator.SetTrigger("special");
+				Throw((int)transform.localScale.x);
+			}
 		}
 	}
 
@@ -91,11 +95,11 @@ public class Player : MonoBehaviour, IInteractable {
 	/// </summary>
 	/// <param name="dir">The direction of the throw</param>
 	public void Throw(int dir) {
-		dir = (int)transform.localScale.x;
+		gameObject.GetComponent<AxeManager>().ThrowAxe();
 
 
 	}
-	
+
 	public void PickUp(Transform position){
 
 	}

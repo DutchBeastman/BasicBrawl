@@ -6,7 +6,7 @@ public class AxeManager : MonoBehaviour {
 	
 	[SerializeField]
 	private int numAxes;
-
+	private int throwableAxes;
 	private List<GameObject> axes;
 	private GameObject axe;
 
@@ -14,9 +14,9 @@ public class AxeManager : MonoBehaviour {
 	void Start () {
 		axes = new List<GameObject>();
 
-
+		throwableAxes = numAxes;
 		for(int i = 0; i < numAxes; i++){
-
+			//Instantiate Axes
 			axes.Add(axe = GameObject.Instantiate(Resources.Load(AXE_PREFAB),transform.position, Quaternion.identity) as GameObject);
 			axe.name = "axe";
 			axe.gameObject.SetActive(false);
@@ -25,9 +25,8 @@ public class AxeManager : MonoBehaviour {
 			
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	public void ThrowAxe(){
+		throwableAxes -= 1;
 	}
+
 }
