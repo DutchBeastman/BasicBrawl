@@ -1,142 +1,137 @@
 using UnityEngine;
 using System.Collections;
 
-public class Player : MonoBehaviour, IInteractable {
-
+public class Player : MonoBehaviour, IPlayer {
 	public const string AXE_PREFAB = "Prefabs/Axe";
-	// speed can be edited in the Editor for easy customization
-	[SerializeField]private float speed = 10.0f;
-	[SerializeField]private int numAxes = 3;
-	[SerializeField]private int jumpHeight = 500;
-	[SerializeField]private Transform respawnPoint;
+	
+	[SerializeField] private Transform respawnPoint;
 
-	private bool lookRight = true;
+	[SerializeField] private KeyCode attackKey;
+
+	[SerializeField] private string horizontal;
+	[SerializeField] private string vertical;
+
+	[SerializeField] private float speed = 10.0f;
+
+	[SerializeField] private int numAxes = 3;
+	[SerializeField] private int jumpHeight = 500;
+	
 	private Animator animator;
-	private Player player;
-	private bool jump;
-	private bool canPickUp;
+
 	private Vector2 footBase;
-	private GameObject axe;
 
+	private bool canPickUp;
+	private bool lookRight = true;
 
-
-
-	void Start(){
-
+	private void Start() {
 		animator = GetComponent<Animator>();
 	}
 
-
-	void Update() {
-		//Determine the animation of the attack and the direction
-		if(Input.GetKeyDown(KeyCode.Space)){
-			if(Random.Range(0f, 1.0f) > 0.1f){
+	private void Update() {
+		// Determine the animation of the attack and the direction
+		if(Input.GetKeyDown(attackKey)) {
+			if(Random.Range(0f, 1.0f) > 0.1f) {
 				Throw((int)transform.localScale.x);
 				animator.SetTrigger("attack");
-			}
-			else{
+			} else {
 				Throw((int)transform.localScale.x);
 				animator.SetTrigger("special");
-				
 			}
 		}
-		//Execute the player movement and everything inside it.
+
+		// Execute the player movement and everything inside it.
 		PlayerMovement();
+	}
 
-
-
-
-		}
-
-	/// <summary cref="C &lt; T &gt;">
-	/// Executes the player movement.
-	/// </summary>
-	public void PlayerMovement(){
-		//get the input and make the player move
-		float translation = Input.GetAxis("Horizontal") * speed;
-		translation *= Time.deltaTime;
-		transform.Translate(translation,0,0);
-
-		//Determine if you can jump by casting a raycast to the ground.
-		footBase = new Vector2(transform.position.x,transform.position.y -0.15f);
-		RaycastHit2D hit = Physics2D.Raycast(footBase, -Vector2.up, 0.5f);
-		if (hit.collider.tag == "Ground" && Input.GetAxis ("Vertical") > 0) {
-			rigidbody2D.AddForce(new Vector2(0f, jumpHeight));
+	private void OnTriggerEnter2D(Collider2D collision){
+		if(collision.collider2D.CompareTag("Axe") && canPickUp){
+			Axe axe = collision.GetComponent<Axe>();
 			
+			if(axe.AmIOwner(this)) {
+				Destroy(collision.collider2D.gameObject);
+				numAxes++;
+			}
+		}
+	}
+
+	/** <summary> Executes the player movement.</summary> */
+	public void PlayerMovement() {
+		// Get the input and make the player move
+		float hor = Input.GetAxis(horizontal);
+		float translation = (hor * speed) * Time.deltaTime;
+
+		transform.Translate(translation, 0, 0);
+
+		// Determine if you can jump by casting a raycast to the ground.
+		footBase = new Vector2(transform.position.x,transform.position.y -0.15f);
+
+		RaycastHit2D hit = Physics2D.Raycast(footBase, -Vector2.up, 0.5f);
+		if(hit.collider != null) {
+			if(hit.collider.CompareTag("Ground") && Input.GetAxis(vertical) > 0) {
+				rigidbody2D.AddForce(new Vector2(0, jumpHeight));
+			}
 		}
 
-
-
-		//executes the walk animation 
-		if(Input.GetAxis("Horizontal") > 0 || Input.GetAxis("Horizontal") < 0){
+		// Executes the walk animation 
+		if(hor > 0 || hor < 0){
 			animator.SetFloat("speed", 1);
-		}else{
+		} else {
 			animator.SetFloat("speed", 0);
 		}
-		//to determine where the player should look
-		if(Input.GetAxis("Horizontal") > 0 && !lookRight){
+
+		// To determine where the player should look
+		if((hor > 0 && !lookRight) || (hor < 0 && lookRight)) {
 			Flip();
 		}
-		if(Input.GetAxis("Horizontal") < 0 && lookRight){
-			Flip();
-		}
-
-	}
-	/// <summary>
-	/// Flip this instance.
-	/// </summary>
-	public void Flip(){
-		var s = transform.localScale;
-		s.x *= -1;
-		transform.localScale = s;
-		lookRight = !lookRight;
-
 	}
 
-	/// <summary>
-	/// Throw the object, always moves in the forward direction
-	/// </summary>
-	/// <param name="dir">The direction of the throw</param>
-	public void Throw(int dir) {
-		//Here I instantiate the axe if I have any left then use the same localscale rotation to determen where to rotate its image to.
-		if(numAxes > 0){
-			axe = GameObject.Instantiate(Resources.Load(AXE_PREFAB),new Vector3(transform.position.x, transform.position.y + 1,0), Quaternion.identity) as GameObject;
-			var s = transform.localScale;
-			s.x *= 1;
+	/** <summary>Throw an axe.</summary>
+	 * <param name="direction">The direction to throw the axe in.</param> */
+	public void Throw(int direction) {
+		// Here I instantiate the axe if I have any left then use the same localscale rotation to determine where to rotate its image to.
+		if(numAxes > 0) {
+			GameObject axe = GameObject.Instantiate(Resources.Load(AXE_PREFAB),new Vector3(transform.position.x, transform.position.y + 1,0), Quaternion.identity) as GameObject;
+			
+			Axe axeComponent = axe.GetComponent<Axe>();
+			axeComponent.Owner = this;
+			
+			Vector3 s = transform.localScale;
+
 			axe.transform.localScale = s;
-			axe.rigidbody2D.AddForce(new Vector2(dir * 1250 , 0));
+			axe.rigidbody2D.AddForce(new Vector2(direction * 1250 , 0));
+
 			canPickUp = false;
-			numAxes -= 1;
+			numAxes--;
 			StartCoroutine(PickUp());
 		}
-
 	}
 
-	/// <summary>
-	/// The axe will turn into an pickup after 2 seconds
-	/// </summary>
-	/// <returns>Wheter you can pick up the axe</returns>
-	IEnumerator PickUp(){
-
-		yield return new WaitForSeconds(2f);
-		canPickUp = true;
-	}
 	public void Respawn(){
 		StartCoroutine(CoRespawn());
 	}
-	IEnumerator CoRespawn(){
-		yield return new WaitForSeconds(3f);
-		transform.position = respawnPoint.transform.position;
-		gameObject.SetActive(true);
+
+	/** <summary>Flip the player.</summary> */
+	private void Flip(){
+		var s = transform.localScale;
+		s.x *= -1;
+
+		transform.localScale = s;
+		lookRight = !lookRight;
 	}
-	public InteractableType GetInteractableType() {
-		return InteractableType.PickUp;
+	
+	/** <summary>Pickup delay after throwing an axe.</summary> */
+	private IEnumerator PickUp() {
+		yield return new WaitForSeconds(2);
+
+		canPickUp = true;
 	}
 
-	void  OnTriggerEnter2D(Collider2D collision){
-		if(collision.collider2D.name == "Axe" && canPickUp){
-			Destroy(collision.collider2D.gameObject);
-			numAxes =+ 1;
-		}
+	/** <summary>Respawn delay.</summary> */
+	private IEnumerator CoRespawn() {
+		yield return new WaitForSeconds(3);
+
+		transform.position = respawnPoint.transform.position;
+
+		gameObject.SetActive(true);
 	}
 }
