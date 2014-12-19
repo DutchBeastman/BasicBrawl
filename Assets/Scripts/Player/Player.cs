@@ -15,7 +15,11 @@ public class Player : MonoBehaviour, IPlayer {
 	[SerializeField] private float speed = 10.0f;
 
 	[SerializeField] private int numAxes = 3;
-	[SerializeField] private int jumpHeight = 500;
+	[SerializeField] private int jumpHeight = 10;
+
+	[SerializeField] private GUIText axeGUI;
+
+	private int pickUpTime = 2;
 
 	private Animator animator;
 
@@ -27,6 +31,9 @@ public class Player : MonoBehaviour, IPlayer {
 	private void Start() {
 		//Getting the animator component
 		animator = GetComponent<Animator>();
+
+		//setting the axe GUI 
+		axeGUI.text = "Axes: " + numAxes;
 	}
 
 	private void Update() {
@@ -43,6 +50,9 @@ public class Player : MonoBehaviour, IPlayer {
 
 		// Execute the player movement and everything inside it.
 		PlayerMovement();
+
+		//updating the Axes GUI
+		axeGUI.text = "Axes: " + numAxes;
 	}
 
 	private void OnTriggerEnter2D(Collider2D collision){
@@ -128,15 +138,18 @@ public class Player : MonoBehaviour, IPlayer {
 	
 	/** <summary>Pickup delay after throwing an axe.</summary> */
 	private IEnumerator PickUp() {
-		yield return new WaitForSeconds(2);
+		yield return new WaitForSeconds(pickUpTime);
 
 		canPickUp = true;
 	}
 
 	/** <summary>Respawn delay.</summary> */
 	private IEnumerator CoRespawn() {
+		pickUpTime = 0;
 		yield return new WaitForSeconds(3);
+		pickUpTime = 2;
 		transform.position = respawnPoint.transform.position;
+
 
 
 	}
