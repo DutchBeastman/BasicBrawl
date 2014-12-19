@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Axe : MonoBehaviour {
 	private Player owner;
-
+	
 	// Make sure that you hit the right collider so that the axe stops moving
 	private void OnCollisionEnter2D(Collision2D collision) {
 		if(collision.collider.CompareTag("Ground") || collision.collider.CompareTag("Wall")) {
@@ -15,7 +15,7 @@ public class Axe : MonoBehaviour {
 				gameObject.collider2D.isTrigger = true;
 				gameObject.rigidbody2D.isKinematic = true;
 				gameObject.rigidbody2D.rotation = 0;
-				collision.gameObject.SetActive(false);
+				collision.gameObject.GetComponent<Player>().Respawn();
 			}
 		}
 	}

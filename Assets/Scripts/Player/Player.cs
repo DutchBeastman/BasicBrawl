@@ -3,8 +3,9 @@ using System.Collections;
 
 public class Player : MonoBehaviour, IPlayer {
 	public const string AXE_PREFAB = "Prefabs/Axe";
-	
+
 	[SerializeField] private Transform respawnPoint;
+	[SerializeField] private Transform purgatory;
 
 	[SerializeField] private KeyCode attackKey;
 
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour, IPlayer {
 
 	[SerializeField] private int numAxes = 3;
 	[SerializeField] private int jumpHeight = 500;
-	
+
 	private Animator animator;
 
 	private Vector2 footBase;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour, IPlayer {
 	private bool lookRight = true;
 
 	private void Start() {
+		//Getting the animator component
 		animator = GetComponent<Animator>();
 	}
 
@@ -44,6 +46,7 @@ public class Player : MonoBehaviour, IPlayer {
 	}
 
 	private void OnTriggerEnter2D(Collider2D collision){
+		//Checking if im triggering an Axe and if I am the owner who can pick it up.
 		if(collision.collider2D.CompareTag("Axe") && canPickUp){
 			Axe axe = collision.GetComponent<Axe>();
 			
@@ -105,9 +108,13 @@ public class Player : MonoBehaviour, IPlayer {
 			StartCoroutine(PickUp());
 		}
 	}
-
+	/** <summary>Executes the Co-routine and resets the player</summary> */
 	public void Respawn(){
+		transform.position = purgatory.transform.position;
 		StartCoroutine(CoRespawn());
+
+
+
 	}
 
 	/** <summary>Flip the player.</summary> */
@@ -129,9 +136,8 @@ public class Player : MonoBehaviour, IPlayer {
 	/** <summary>Respawn delay.</summary> */
 	private IEnumerator CoRespawn() {
 		yield return new WaitForSeconds(3);
-
 		transform.position = respawnPoint.transform.position;
 
-		gameObject.SetActive(true);
+
 	}
 }
